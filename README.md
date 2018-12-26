@@ -36,3 +36,18 @@ Each directory listed should have a README.md with more information.
 * [simple-unary-stream](./simple-unary-stream) abstracts the message handling into a common library.
 
 
+The clients and servers use h2c (HTTP2 over plaintext connections). They do not support TLS.  In production, something like [envoy](https://www.envoyproxy.io) handles hop-to-hop encryption for me.
+
+## Usage
+
+These have been tested with Go 1.11.4.  Clone this into your Go path like:
+
+```bash
+mkdir -p $(go env GOPATH)/src/github.com/bakins
+cd $(go env GOPATH)/src/github.com/bakins
+git clone https://github.com/bakins/grpc-the-hard-way.git grpc-the-hard-way
+cd grpc-the-hard-way
+```
+
+Any commands ran in any docs assume they are being ran from the root of the
+repository clone.
