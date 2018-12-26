@@ -78,8 +78,18 @@ func main() {
 		log.Fatalf("unexpected status code: %d %s", resp.StatusCode, resp.Status)
 	}
 
+	s = stream.New(resp.Body, resp.Header.Get("Grpc-Encoding") == "gzip")
+
+	var helloResponse pb.HelloReply
+
+	if err := s.Read(&helloResponse); err != nil {
+		log.Fatalf("failed to read response: %v", err)
+	}
+
+	log.Printf("response: %s", helloResponse.GetMessage())
+
 	status := 0
-	grpcStatus := resp.Header.Get("Grpc-Status")
+	grpcStatus := resp.Trailer.Get("Grpc-Status")
 	if grpcStatus != "" {
 		s, err := strconv.Atoi(grpcStatus)
 		if err != nil {
@@ -90,18 +100,9 @@ func main() {
 
 	log.Printf("grpc-status: %d", status)
 	// Note: grpc-message may not be sent if status is 0/ok
-	log.Printf("grpc-message: %s", resp.Header.Get("Grpc-Message"))
+	log.Printf("grpc-message: %s", resp.Trailer.Get("Grpc-Message"))
 	if status != 0 {
 		log.Fatal("unexpected grpc status")
 	}
 
-	s = stream.New(resp.Body, resp.Header.Get("Grpc-Encoding") == "gzip")
-
-	var helloResponse pb.HelloReply
-
-	if err := s.Read(&helloResponse); err != nil {
-		log.Fatalf("failed to read response: %v", err)
-	}
-
-	log.Printf("response: %s", helloResponse.GetMessage())
 }

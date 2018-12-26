@@ -88,29 +88,6 @@ func main() {
 		log.Fatalf("unexpected status code: %d %s", resp.StatusCode, resp.Status)
 	}
 
-	status := 0
-
-	// this is set in a trailer sent by the server.  However, in stdlib
-	// http client, you get them using the Headers.
-	// Note: this works in a unary service with small messages
-	// as the client reads the body all at once.  To be "correct",
-	// we should read the body completely then check the trailers.
-	grpcStatus := resp.Header.Get("Grpc-Status")
-	if grpcStatus != "" {
-		s, err := strconv.Atoi(grpcStatus)
-		if err != nil {
-			log.Fatalf("failed to parse grpc-status %s: %v", grpcStatus, err)
-		}
-		status = s
-	}
-
-	log.Printf("grpc-status: %d", status)
-	// Note: grpc-message may not be sent if status is 0/ok
-	log.Printf("grpc-message: %s", resp.Header.Get("Grpc-Message"))
-	if status != 0 {
-		log.Fatal("unexpected grpc status")
-	}
-
 	// read the response, starting with the prefix
 	prefix = []byte{0, 0, 0, 0, 0}
 	_, err = resp.Body.Read(prefix)
@@ -137,4 +114,22 @@ func main() {
 	}
 
 	log.Printf("response: %s", helloResponse.GetMessage())
+
+	status := 0
+	// this is set in a trailer sent by the server.
+	grpcStatus := resp.Trailer.Get("Grpc-Status")
+	if grpcStatus != "" {
+		s, err := strconv.Atoi(grpcStatus)
+		if err != nil {
+			log.Fatalf("failed to parse grpc-status %s: %v", grpcStatus, err)
+		}
+		status = s
+	}
+
+	log.Printf("grpc-status: %d", status)
+	// Note: grpc-message may not be sent if status is 0/ok
+	log.Printf("grpc-message: %s", resp.Trailer.Get("Grpc-Message"))
+	if status != 0 {
+		log.Fatal("unexpected grpc status")
+	}
 }
