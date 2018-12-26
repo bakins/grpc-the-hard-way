@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -65,9 +66,7 @@ func handleListFeatures(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/grpc+proto")
 
 	// We must include trailers for status and message.
-	w.Header().Set("Trailer", "grpc-status, grpc-message")
-	w.Header().Set("grpc-status", strconv.Itoa(0))
-	w.Header().Set("grpc-message", "ok")
+	w.Header().Set("Trailer", "Grpc-Status, Grpc-Message")
 	w.Header().Set("grpc-accept-encoding", "gzip")
 
 	if useGzip {
@@ -82,5 +81,15 @@ func handleListFeatures(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "failed to write response: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		time.Sleep(time.Second * 1)
+
 	}
+
+	w.Header().Set("Grpc-Status", strconv.Itoa(0))
+	w.Header().Set("Grpc-Message", "ok")
+
 }
