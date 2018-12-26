@@ -51,3 +51,10 @@ cd grpc-the-hard-way
 
 Any commands ran in any docs assume they are being ran from the root of the
 repository clone.
+
+## TODO
+
+* streaming server
+* streaming client
+* bi-directional communication
+
