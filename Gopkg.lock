@@ -72,7 +72,7 @@
   revision = "bd9b4fb69e2ffd37621a6caa54dcbead29b546f2"
 
 [[projects]]
-  digest = "1:da902769aabc31bd09886d9cbd51d1ed7470396b4c8adf0b49dea2a8d8820ab4"
+  digest = "1:0555c4a7a341c5ad5d186b2ade86dcab6f2553b0d1a8c616ea69e62f94cf53d9"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -88,6 +88,7 @@
     "encoding/gzip",
     "encoding/proto",
     "examples/helloworld/helloworld",
+    "examples/route_guide/routeguide",
     "grpclog",
     "internal",
     "internal/backoff",
@@ -125,6 +126,7 @@
     "google.golang.org/grpc",
     "google.golang.org/grpc/encoding/gzip",
     "google.golang.org/grpc/examples/helloworld/helloworld",
+    "google.golang.org/grpc/examples/route_guide/routeguide",
     "google.golang.org/grpc/reflection",
   ]
   solver-name = "gps-cdcl"
