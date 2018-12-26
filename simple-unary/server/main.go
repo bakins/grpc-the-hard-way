@@ -94,6 +94,7 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/grpc+proto")
 
 	// We must include trailers for status and message.
+	// See https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
 	w.Header().Set("Trailer", "grpc-status, grpc-message")
 	w.Header().Set("grpc-status", strconv.Itoa(0))
 	w.Header().Set("grpc-message", "ok")

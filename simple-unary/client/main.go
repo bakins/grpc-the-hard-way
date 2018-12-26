@@ -52,6 +52,14 @@ func main() {
 		log.Fatalf("failed to marshal request: %v", err)
 	}
 
+	// gRPC requests and responses include a prefix before each message
+	// The prefix is
+	//  - one byte flag that denotes if the the message is compressed or not
+	//  - four bytes that are an unsigned 32 bit integer. This is the length
+	//    of the message.
+	// The message follows this prefix.
+	// See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+
 	// create a prefix message.
 	// this version does not support compression, so flag is always 0
 	prefix := []byte{0, 0, 0, 0, 0}
@@ -81,6 +89,12 @@ func main() {
 	}
 
 	status := 0
+
+	// this is set in a trailer sent by the server.  However, in stdlib
+	// http client, you get them using the Headers.
+	// Note: this works in a unary service with small messages
+	// as the client reads the body all at once.  To be "correct",
+	// we should read the body completely then check the trailers.
 	grpcStatus := resp.Header.Get("Grpc-Status")
 	if grpcStatus != "" {
 		s, err := strconv.Atoi(grpcStatus)
