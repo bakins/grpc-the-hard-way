@@ -1,0 +1,12 @@
+[[constraint]]
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
+  name = "golang.org/x/net"
+
+[[constraint]]
+  version = "v1.17.0"
+  name = "google.golang.org/grpc"
+
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
