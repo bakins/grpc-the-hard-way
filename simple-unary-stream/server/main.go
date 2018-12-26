@@ -49,8 +49,6 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 
 	// We must include trailers for status and message.
 	w.Header().Set("Trailer", "grpc-status, grpc-message")
-	w.Header().Set("grpc-status", strconv.Itoa(0))
-	w.Header().Set("grpc-message", "ok")
 	w.Header().Set("grpc-accept-encoding", "gzip")
 
 	if useGzip {
@@ -67,4 +65,7 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "failed to write response: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Grpc-Status", strconv.Itoa(0))
+	w.Header().Set("Grpc-Message", "ok")
 }

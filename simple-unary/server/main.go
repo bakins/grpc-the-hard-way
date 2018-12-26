@@ -96,8 +96,6 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 	// We must include trailers for status and message.
 	// See https://golang.org/pkg/net/http/#example_ResponseWriter_trailers
 	w.Header().Set("Trailer", "grpc-status, grpc-message")
-	w.Header().Set("grpc-status", strconv.Itoa(0))
-	w.Header().Set("grpc-message", "ok")
 
 	// any non-protocol error should still return an HTTP 200
 	// and use grpc-status to report the error
@@ -116,4 +114,7 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 		log.Printf("failed to write body: %v", err)
 		return
 	}
+
+	w.Header().Set("grpc-status", strconv.Itoa(0))
+	w.Header().Set("grpc-message", "ok")
 }
