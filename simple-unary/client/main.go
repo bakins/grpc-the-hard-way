@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"flag"
+	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -114,6 +116,11 @@ func main() {
 	}
 
 	log.Printf("response: %s", helloResponse.GetMessage())
+
+	// must read until EOF to ensure trailers are read
+	if _, err = ioutil.ReadAll(resp.Body); err != nil && err != io.EOF {
+		log.Fatalf("unexpected error: %v", err)
+	}
 
 	status := 0
 	// this is set in a trailer sent by the server.

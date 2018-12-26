@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
+	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -96,6 +98,11 @@ func main() {
 			log.Fatalf("failed to parse grpc-status %s: %v", grpcStatus, err)
 		}
 		status = s
+	}
+
+	// must read until EOF to ensure trailers are read
+	if _, err = ioutil.ReadAll(resp.Body); err != nil && err != io.EOF {
+		log.Fatalf("unexpected error: %v", err)
 	}
 
 	log.Printf("grpc-status: %d", status)

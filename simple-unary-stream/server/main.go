@@ -55,6 +55,8 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Grpc-Encoding", "gzip")
 	}
 
+	w.WriteHeader(200)
+
 	writer := stream.New(w, useGzip)
 
 	resp := pb.HelloReply{
