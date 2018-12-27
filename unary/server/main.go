@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	pb "github.com/bakins/grpc-the-hard-way/helloworld/pb/helloworld"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	if err := s.ListenAndServe(); err != nil {
-		log.Fatalf("failed to server: %v", err)
+		log.Fatalf("failed to start server: %v", err)
 	}
 }
 

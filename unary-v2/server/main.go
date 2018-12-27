@@ -9,8 +9,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	pb "github.com/bakins/grpc-the-hard-way/helloworld/pb/helloworld"
-	"github.com/bakins/grpc-the-hard-way/simple-unary-stream/stream"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
+	"github.com/bakins/grpc-the-hard-way/unary-v2/message"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// path is <package>.<service>/<method>
+	// path is /<package>.<service>/<method>
 	mux.HandleFunc("/helloworld.Greeter/SayHello", handleSayHello)
 
 	s := http.Server{
@@ -34,12 +34,11 @@ func main() {
 }
 
 func handleSayHello(w http.ResponseWriter, r *http.Request) {
+	useGzip := r.Header.Get("Grpc-Encoding") == "gzip"
+
 	var req pb.HelloRequest
 
-	useGzip := r.Header.Get("Grpc-Encoding") == "gzip"
-	reader := stream.New(r.Body, useGzip)
-
-	if err := reader.Read(&req); err != nil {
+	if err := message.Read(r.Body, &req); err != nil {
 		http.Error(w, "failed to read request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -57,13 +56,11 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 
-	writer := stream.New(w, useGzip)
-
 	resp := pb.HelloReply{
 		Message: "hello " + req.GetName(),
 	}
 
-	if err := writer.Write(&resp); err != nil {
+	if err := message.Write(w, &resp, useGzip); err != nil {
 		http.Error(w, "failed to write response: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

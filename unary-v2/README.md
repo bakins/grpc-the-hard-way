@@ -1,8 +1,8 @@
-# simple-unary-stream
+# unary implementation with message handling library
 
-This contains simple implementations of a gRPC service.  This is a modification of the [simple-unary](../simple-unary) examples.
+This contains simple implementations of a gRPC service.  This is a modification of the [unary](../unary) examples.
 
-The gRPC message framing has been abstracted into a [stream](./stream) library. These examples do support [gRPC payload compression](https://github.com/grpc/grpc/blob/d8662f5704ec6f03122943f9baa5ed07b88a1fdf/doc/compression.md).
+The gRPC message framing has been abstracted into a [message](./message) library. These examples support [gRPC payload compression](https://github.com/grpc/grpc/blob/d8662f5704ec6f03122943f9baa5ed07b88a1fdf/doc/compression.md).
 
 The comments in the code should hopefully be detailed enough to give you a rough idea about what is happening.
 
@@ -10,19 +10,19 @@ The comments in the code should hopefully be detailed enough to give you a rough
 
 To test, open two terminal windows and cd into the root of your clone of this repository.
 
-These examples are similar to the [simple-unary](../simple-unary) examples, but they use a library that implements payload compression.
+These examples are similar to the [unary](../unary) examples, but they use a library that implements payload compression.
 
 ### client
 To test the client, run the following in the first terminal window:
 
 ```shell
-go run ./standard-grpc/greeter_server/main.go
+go run ./standard/greeter_server/main.go
 ```
 
 and in the second:
 
 ```shell
-go run ./simple-unary-stream/client/main.go
+go run ./unary-v2/client/main.go
 ```
 
 You should see something like:
@@ -38,13 +38,13 @@ You should see something like:
 To test the server, run the following in the first terminal window:
 
 ```shell
-go run ./simple-unary-stream/server/main.go
+go run ./unary-v2/server/main.go
 ```
 
 and in the second:
 
 ```shell
-go run ./standard-grpc/greeter_client/main.go -gzip
+go run ./standard/greeter_client/main.go -gzip
 ```
 
 You should see something like:

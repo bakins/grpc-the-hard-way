@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -16,7 +15,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/http2"
 
-	pb "github.com/bakins/grpc-the-hard-way/helloworld/pb/helloworld"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
 )
 
 const (
@@ -63,7 +62,8 @@ func main() {
 	// See https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
 
 	// create a prefix message.
-	// this version does not support compression, so flag is always 0
+	// this version does not support compression, so flag is always 0.
+	// using this syntax rather than make just to be more explicit.
 	prefix := []byte{0, 0, 0, 0, 0}
 	binary.BigEndian.PutUint32(prefix[1:], uint32(len(body)))
 
@@ -117,8 +117,9 @@ func main() {
 
 	log.Printf("response: %s", helloResponse.GetMessage())
 
-	// must read until EOF to ensure trailers are read
-	if _, err = ioutil.ReadAll(resp.Body); err != nil && err != io.EOF {
+	// must read until EOF to ensure trailers are read.
+	// there should be no data left before trailers.
+	if _, err = resp.Body.Read([]byte{}); err != io.EOF {
 		log.Fatalf("unexpected error: %v", err)
 	}
 
