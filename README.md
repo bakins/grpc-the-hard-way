@@ -35,6 +35,7 @@ Each directory listed should have a README.md with more information.
 * [services](./services) gRPC service proto definitions and generated code.
 * [unary](./unary) contains naive implementations of a simple gRPC service.
 * [unary-v2](./unary-v2) abstracts the message handling into a common library.
+* [server-stream](./server-stream) is a simple streaming gRPC server implementation.
 
 
 The clients and servers use h2c (HTTP2 over plaintext connections). They do not support TLS.  In production, something like [envoy](https://www.envoyproxy.io) handles hop-to-hop encryption for me.
@@ -55,7 +56,6 @@ repository clone.
 
 ## TODO
 
-* streaming server
 * streaming client
 * bi-directional communication
 
