@@ -11,7 +11,7 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld"
 )
 
 func main() {

@@ -3,13 +3,15 @@ package main
 import (
 	"flag"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	pb "github.com/bakins/grpc-the-hard-way/services/helloworld"
+	pb "github.com/bakins/grpc-the-hard-way/services/greetings"
 	"github.com/bakins/grpc-the-hard-way/unary-v2/message"
 )
 
@@ -21,7 +23,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// path is /<package>.<service>/<method>
-	mux.HandleFunc("/helloworld.Greeter/SayHello", handleSayHello)
+	mux.HandleFunc("/greetings.Greeter/ShareGreetings", handleShareGreetings)
 
 	s := http.Server{
 		Addr:    *address,
@@ -33,10 +35,20 @@ func main() {
 	}
 }
 
-func handleSayHello(w http.ResponseWriter, r *http.Request) {
+var greetings = []string{
+	"Hello",
+	"Hola",
+	"Hallo",
+	"Bonjour",
+	"こんにちは",
+	"مرحبا",
+	"γεια σας",
+}
+
+func handleShareGreetings(w http.ResponseWriter, r *http.Request) {
 	useGzip := r.Header.Get("Grpc-Encoding") == "gzip"
 
-	var req pb.HelloRequest
+	var req pb.GreetingRequest
 
 	if err := message.Read(r.Body, &req); err != nil {
 		http.Error(w, "failed to read request: "+err.Error(), http.StatusBadRequest)
@@ -56,13 +68,29 @@ func handleSayHello(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 
-	resp := pb.HelloReply{
-		Message: "hello " + req.GetName(),
-	}
+	// randomize the list
+	tmp := make([]string, len(greetings))
+	copy(tmp, greetings)
+	rand.Shuffle(len(tmp), func(i, j int) {
+		tmp[i], tmp[j] = tmp[j], tmp[i]
+	})
 
-	if err := message.Write(w, &resp, useGzip); err != nil {
-		http.Error(w, "failed to write response: "+err.Error(), http.StatusInternalServerError)
-		return
+	for _, g := range tmp {
+		resp := pb.GreetingReply{
+			Message: g + " " + req.GetName(),
+		}
+
+		if err := message.Write(w, &resp, useGzip); err != nil {
+			http.Error(w, "failed to write response: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// in this example, we are flushing on each greeting
+		// and sleeping to simulate doing some server side work
+		if f, ok := w.(http.Flusher); ok {
+			f.Flush()
+		}
+		time.Sleep(time.Millisecond * 250)
 	}
 
 	w.Header().Set("Grpc-Status", strconv.Itoa(0))

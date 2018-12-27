@@ -13,8 +13,8 @@ import (
 
 	"golang.org/x/net/http2"
 
-	pb "github.com/bakins/grpc-the-hard-way/services/helloworld"
-	"github.com/bakins/grpc-the-hard-way/unary-v2/message"
+	"github.com/bakins/grpc-the-hard-way/server-stream/message"
+	pb "github.com/bakins/grpc-the-hard-way/services/greetings"
 )
 
 const (
@@ -42,7 +42,7 @@ func main() {
 		Transport: t,
 	}
 
-	req := pb.HelloRequest{
+	req := pb.GreetingRequest{
 		Name: name,
 	}
 
@@ -53,7 +53,7 @@ func main() {
 
 	// path is /<package>.<service>/<method>
 	r, err := http.NewRequest(http.MethodPost,
-		"http://"+*address+"/helloworld.Greeter/SayHello",
+		"http://"+*address+"/greetings.Greeter/ShareGreetings",
 		bytes.NewBuffer(buf.Bytes()),
 	)
 
@@ -76,18 +76,25 @@ func main() {
 		log.Fatalf("unexpected status code: %d %s", resp.StatusCode, resp.Status)
 	}
 
-	var helloResponse pb.HelloReply
+	// for a server side streaming reply, we loop until we get EOF
+READ:
+	for {
+		var response pb.GreetingReply
 
-	if err := message.Read(resp.Body, &helloResponse); err != nil {
-		log.Fatalf("failed to read response: %v", err)
-	}
+		err := message.Read(resp.Body, &response)
 
-	log.Printf("response: %s", helloResponse.GetMessage())
+		switch err {
+		case nil:
+			// keep going
+		case io.EOF:
+			// done reading
+			break READ
+		default:
+			log.Fatalf("failed to read response: %v", err)
+		}
 
-	// must read until EOF to ensure trailers are read.
-	// there should be no data left before the trailers.
-	if _, err = resp.Body.Read([]byte{}); err != io.EOF {
-		log.Fatalf("unexpected error: %v", err)
+		log.Printf("response: %s", response.GetMessage())
+
 	}
 
 	status := 0

@@ -15,7 +15,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/http2"
 
-	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld"
 )
 
 const (
