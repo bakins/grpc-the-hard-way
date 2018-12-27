@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -14,8 +13,8 @@ import (
 
 	"golang.org/x/net/http2"
 
-	pb "github.com/bakins/grpc-the-hard-way/helloworld/pb/helloworld"
-	"github.com/bakins/grpc-the-hard-way/simple-unary-stream/stream"
+	pb "github.com/bakins/grpc-the-hard-way/services/helloworld/helloworld"
+	"github.com/bakins/grpc-the-hard-way/unary-v2/message"
 )
 
 const (
@@ -43,19 +42,16 @@ func main() {
 		Transport: t,
 	}
 
-	var buf bytes.Buffer
-
-	s := stream.New(&buf, true)
-
 	req := pb.HelloRequest{
 		Name: name,
 	}
 
-	if err := s.Write(&req); err != nil {
+	var buf bytes.Buffer
+	if err := message.Write(&buf, &req, true); err != nil {
 		log.Fatalf("failed to prepare request: %v", err)
 	}
 
-	// path is <package>.<service>/<method>
+	// path is /<package>.<service>/<method>
 	r, err := http.NewRequest(http.MethodPost,
 		"http://"+*address+"/helloworld.Greeter/SayHello",
 		bytes.NewBuffer(buf.Bytes()),
@@ -80,15 +76,19 @@ func main() {
 		log.Fatalf("unexpected status code: %d %s", resp.StatusCode, resp.Status)
 	}
 
-	s = stream.New(resp.Body, resp.Header.Get("Grpc-Encoding") == "gzip")
-
 	var helloResponse pb.HelloReply
 
-	if err := s.Read(&helloResponse); err != nil {
+	if err := message.Read(resp.Body, &helloResponse); err != nil {
 		log.Fatalf("failed to read response: %v", err)
 	}
 
 	log.Printf("response: %s", helloResponse.GetMessage())
+
+	// must read until EOF to ensure trailers are read.
+	// there should be no data left before the trailers.
+	if _, err = resp.Body.Read([]byte{}); err != io.EOF {
+		log.Fatalf("unexpected error: %v", err)
+	}
 
 	status := 0
 	grpcStatus := resp.Trailer.Get("Grpc-Status")
@@ -100,16 +100,10 @@ func main() {
 		status = s
 	}
 
-	// must read until EOF to ensure trailers are read
-	if _, err = ioutil.ReadAll(resp.Body); err != nil && err != io.EOF {
-		log.Fatalf("unexpected error: %v", err)
-	}
-
 	log.Printf("grpc-status: %d", status)
 	// Note: grpc-message may not be sent if status is 0/ok
 	log.Printf("grpc-message: %s", resp.Trailer.Get("Grpc-Message"))
 	if status != 0 {
 		log.Fatal("unexpected grpc status")
 	}
-
 }

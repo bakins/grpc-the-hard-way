@@ -1,4 +1,4 @@
-# standard-grpc
+# standard
 
 This directory contains clients and servers  written using the ["standard" gRPC Go implementation](https://godoc.org/google.golang.org/grpc).
 

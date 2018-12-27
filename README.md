@@ -31,9 +31,10 @@ The [gRPC Protocol document](https://github.com/grpc/grpc/blob/master/doc/PROTOC
 
 Each directory listed should have a README.md with more information.
 
-* [standard-grpc](./standard-grpc) contains clients and servers written using the ["standard" gRPC Go implementation](https://godoc.org/google.golang.org/grpc). These are used to test my implementations.
-* [simple-unary](./simple-unary) contains naive implementations of a simple gRPC service.
-* [simple-unary-stream](./simple-unary-stream) abstracts the message handling into a common library.
+* [standard](./standard) contains clients and servers written using the ["standard" gRPC Go implementation](https://godoc.org/google.golang.org/grpc). These are used to test my implementations.
+* [services](./services) gRPC service proto definitions and generated code.
+* [unary](./unary) contains naive implementations of a simple gRPC service.
+* [unary-v2](./unary-v2) abstracts the message handling into a common library.
 
 
 The clients and servers use h2c (HTTP2 over plaintext connections). They do not support TLS.  In production, something like [envoy](https://www.envoyproxy.io) handles hop-to-hop encryption for me.
