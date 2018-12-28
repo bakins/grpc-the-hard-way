@@ -75,6 +75,11 @@ func (s *server) CrowdGreeting(stream pb.Greeter_CrowdGreetingServer) error {
 	return nil
 }
 
+func (s *server) StreamGreetings(stream pb.Greeter_StreamGreetingsServer) error {
+	// unused in this example, but needed to implement the interface
+	return nil
+}
+
 func main() {
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

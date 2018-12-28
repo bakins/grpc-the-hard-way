@@ -8,5 +8,7 @@ This directory contains clients and servers  written using the ["standard" gRPC 
 * [server-stream-client](./server-stream-client) client of the streaming helloworld service.
 * [client-stream-server](./client-stream-server) server that expects a client streaming request.
 * [client-stream-client](./client-stream-client) client that sends streaming greetings requests.
+* [bidi-server](./bidi-server) bidirectional streaming gRPC server
+* [bidi-client](./bidi-client) bidirectional streaming gRPC client
 
 This contains code licensed under the Apache 2 license, copyrighted by the gRPC authors.
