@@ -21,8 +21,8 @@ package main
 import (
 	"io"
 	"log"
+	"math/rand"
 	"net"
-	"strings"
 
 	pb "github.com/bakins/grpc-the-hard-way/services/greetings"
 	"google.golang.org/grpc"
@@ -41,13 +41,22 @@ func (s *server) ShareGreetings(req *pb.GreetingRequest, stream pb.Greeter_Share
 	return nil
 }
 
-func (s *server) StreamGreetings(stream pb.Greeter_StreamGreetingsServer) error {
+func (s *server) CrowdGreeting(stream pb.Greeter_CrowdGreetingServer) error {
 	// unused in this example, but needed to implement the interface
 	return nil
 }
 
-func (s *server) CrowdGreeting(stream pb.Greeter_CrowdGreetingServer) error {
-	var names []string
+var greetings = []string{
+	"Hello",
+	"Hola",
+	"Hallo",
+	"Bonjour",
+	"こんにちは",
+	"مرحبا",
+	"γεια σας",
+}
+
+func (s *server) StreamGreetings(stream pb.Greeter_StreamGreetingsServer) error {
 READ:
 	for {
 		req, err := stream.Recv()
@@ -61,15 +70,16 @@ READ:
 			log.Printf("failed to read from stream: %v", err)
 			return err
 		}
-		names = append(names, req.GetName())
-	}
 
-	resp := pb.GreetingReply{
-		Message: "hello " + strings.Join(names, ", "),
-	}
+		n := rand.Int() % len(greetings)
 
-	if err := stream.SendAndClose(&resp); err != nil {
-		return err
+		resp := pb.GreetingReply{
+			Message: greetings[n] + " " + req.GetName(),
+		}
+
+		if err := stream.Send(&resp); err != nil {
+			return err
+		}
 	}
 
 	return nil

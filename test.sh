@@ -29,7 +29,8 @@ TESTS["go run ./standard/client-stream-server/main.go"]="go run ./client-stream/
 TESTS["go run ./client-stream/server/main.go"]="go run ./standard/client-stream-client/main.go -gzip"
 TESTS["go run ./standard/server-stream-server/main.go"]="go run ./server-stream/client/main.go"
 TESTS["go run ./server-stream/server/main.go"]="go run ./standard/server-stream-client/main.go -gzip"
-
+TESTS["go run ./bidi/server/main.go"]="go run ./standard/bidi-client/main.go -gzip"
+TESTS["go run ./standard/bidi-server/main.go"]="go run ./bidi/client/main.go"
 for SERVER in "${!TESTS[@]}"; do
     CLIENT="${TESTS[$SERVER]}"
 

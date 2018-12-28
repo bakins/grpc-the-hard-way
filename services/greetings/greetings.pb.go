@@ -34,7 +34,7 @@ func (m *GreetingRequest) Reset()         { *m = GreetingRequest{} }
 func (m *GreetingRequest) String() string { return proto.CompactTextString(m) }
 func (*GreetingRequest) ProtoMessage()    {}
 func (*GreetingRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_greetings_40c0f9b7f0905f74, []int{0}
+	return fileDescriptor_greetings_f00096a21a597122, []int{0}
 }
 func (m *GreetingRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GreetingRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *GreetingReply) Reset()         { *m = GreetingReply{} }
 func (m *GreetingReply) String() string { return proto.CompactTextString(m) }
 func (*GreetingReply) ProtoMessage()    {}
 func (*GreetingReply) Descriptor() ([]byte, []int) {
-	return fileDescriptor_greetings_40c0f9b7f0905f74, []int{1}
+	return fileDescriptor_greetings_f00096a21a597122, []int{1}
 }
 func (m *GreetingReply) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GreetingReply.Unmarshal(m, b)
@@ -117,6 +117,7 @@ const _ = grpc.SupportPackageIsVersion4
 type GreeterClient interface {
 	ShareGreetings(ctx context.Context, in *GreetingRequest, opts ...grpc.CallOption) (Greeter_ShareGreetingsClient, error)
 	CrowdGreeting(ctx context.Context, opts ...grpc.CallOption) (Greeter_CrowdGreetingClient, error)
+	StreamGreetings(ctx context.Context, opts ...grpc.CallOption) (Greeter_StreamGreetingsClient, error)
 }
 
 type greeterClient struct {
@@ -193,11 +194,43 @@ func (x *greeterCrowdGreetingClient) CloseAndRecv() (*GreetingReply, error) {
 	return m, nil
 }
 
+func (c *greeterClient) StreamGreetings(ctx context.Context, opts ...grpc.CallOption) (Greeter_StreamGreetingsClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_Greeter_serviceDesc.Streams[2], c.cc, "/greetings.Greeter/StreamGreetings", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greeterStreamGreetingsClient{stream}
+	return x, nil
+}
+
+type Greeter_StreamGreetingsClient interface {
+	Send(*GreetingRequest) error
+	Recv() (*GreetingReply, error)
+	grpc.ClientStream
+}
+
+type greeterStreamGreetingsClient struct {
+	grpc.ClientStream
+}
+
+func (x *greeterStreamGreetingsClient) Send(m *GreetingRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *greeterStreamGreetingsClient) Recv() (*GreetingReply, error) {
+	m := new(GreetingReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // Server API for Greeter service
 
 type GreeterServer interface {
 	ShareGreetings(*GreetingRequest, Greeter_ShareGreetingsServer) error
 	CrowdGreeting(Greeter_CrowdGreetingServer) error
+	StreamGreetings(Greeter_StreamGreetingsServer) error
 }
 
 func RegisterGreeterServer(s *grpc.Server, srv GreeterServer) {
@@ -251,6 +284,32 @@ func (x *greeterCrowdGreetingServer) Recv() (*GreetingRequest, error) {
 	return m, nil
 }
 
+func _Greeter_StreamGreetings_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GreeterServer).StreamGreetings(&greeterStreamGreetingsServer{stream})
+}
+
+type Greeter_StreamGreetingsServer interface {
+	Send(*GreetingReply) error
+	Recv() (*GreetingRequest, error)
+	grpc.ServerStream
+}
+
+type greeterStreamGreetingsServer struct {
+	grpc.ServerStream
+}
+
+func (x *greeterStreamGreetingsServer) Send(m *GreetingReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *greeterStreamGreetingsServer) Recv() (*GreetingRequest, error) {
+	m := new(GreetingRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 var _Greeter_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "greetings.Greeter",
 	HandlerType: (*GreeterServer)(nil),
@@ -266,22 +325,29 @@ var _Greeter_serviceDesc = grpc.ServiceDesc{
 			Handler:       _Greeter_CrowdGreeting_Handler,
 			ClientStreams: true,
 		},
+		{
+			StreamName:    "StreamGreetings",
+			Handler:       _Greeter_StreamGreetings_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
 	},
 	Metadata: "greetings.proto",
 }
 
-func init() { proto.RegisterFile("greetings.proto", fileDescriptor_greetings_40c0f9b7f0905f74) }
+func init() { proto.RegisterFile("greetings.proto", fileDescriptor_greetings_f00096a21a597122) }
 
-var fileDescriptor_greetings_40c0f9b7f0905f74 = []byte{
-	// 159 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_greetings_f00096a21a597122 = []byte{
+	// 175 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4f, 0x2f, 0x4a, 0x4d,
 	0x2d, 0xc9, 0xcc, 0x4b, 0x2f, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x84, 0x0b, 0x28,
 	0xa9, 0x72, 0xf1, 0xbb, 0x43, 0x39, 0x41, 0xa9, 0x85, 0xa5, 0xa9, 0xc5, 0x25, 0x42, 0x42, 0x5c,
 	0x2c, 0x79, 0x89, 0xb9, 0xa9, 0x12, 0x8c, 0x0a, 0x8c, 0x1a, 0x9c, 0x41, 0x60, 0xb6, 0x92, 0x26,
 	0x17, 0x2f, 0x42, 0x59, 0x41, 0x4e, 0xa5, 0x90, 0x04, 0x17, 0x7b, 0x6e, 0x6a, 0x71, 0x71, 0x62,
-	0x3a, 0x4c, 0x1d, 0x8c, 0x6b, 0xb4, 0x80, 0x91, 0x8b, 0x1d, 0xac, 0x36, 0xb5, 0x48, 0xc8, 0x8b,
+	0x3a, 0x4c, 0x1d, 0x8c, 0x6b, 0xf4, 0x9e, 0x91, 0x8b, 0x1d, 0xac, 0x36, 0xb5, 0x48, 0xc8, 0x8b,
 	0x8b, 0x2f, 0x38, 0x23, 0xb1, 0x28, 0x15, 0xa6, 0xb7, 0x58, 0x48, 0x4a, 0x0f, 0xe1, 0x18, 0x34,
 	0x8b, 0xa5, 0x24, 0xb0, 0xca, 0x15, 0xe4, 0x54, 0x2a, 0x31, 0x18, 0x30, 0x0a, 0x79, 0x72, 0xf1,
-	0x3a, 0x17, 0xe5, 0x97, 0xa7, 0xc0, 0x64, 0xc8, 0x35, 0x4a, 0x83, 0x31, 0x89, 0x0d, 0x1c, 0x0c,
-	0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9a, 0xfc, 0x7c, 0x87, 0x19, 0x01, 0x00, 0x00,
+	0x3a, 0x17, 0xe5, 0x97, 0xa7, 0xc0, 0x64, 0xc8, 0x35, 0x4a, 0x83, 0x51, 0xc8, 0x97, 0x8b, 0x3f,
+	0xb8, 0xa4, 0x28, 0x35, 0x31, 0x97, 0x62, 0x77, 0x69, 0x30, 0x1a, 0x30, 0x26, 0xb1, 0x81, 0x43,
+	0xd5, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x8f, 0xe9, 0x18, 0x89, 0x68, 0x01, 0x00, 0x00,
 }
