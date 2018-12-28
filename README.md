@@ -5,7 +5,7 @@ gRPC clients and servers in Go using stdlib and a few helpers. Avoid https://god
 ## Motivation
 
 gRPC in Go is often criticized for being bloated and/or too complicated.
-However, gRPC the protocol is relatively simply.  I wanted to see
+However, gRPC the protocol is relatively simple.  I wanted to see
 how far I could get using stdlib to implement gRPC in Go.
 
 Originally, I was going to write a reusable, alternative gRPC Go package,
