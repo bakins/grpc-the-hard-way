@@ -19,6 +19,7 @@ package greetings;
 
 service Greeter {
   rpc ShareGreetings (GreetingRequest) returns (stream GreetingReply) {}
+  rpc CrowdGreeting(stream GreetingRequest) returns (GreetingReply) {}
 }
 
 message GreetingRequest {

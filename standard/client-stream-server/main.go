@@ -19,10 +19,10 @@
 package main
 
 import (
+	"io"
 	"log"
-	"math/rand"
 	"net"
-	"time"
+	"strings"
 
 	pb "github.com/bakins/grpc-the-hard-way/services/greetings"
 	"google.golang.org/grpc"
@@ -36,42 +36,37 @@ const (
 
 type server struct{}
 
-var greetings = []string{
-	"Hello",
-	"Hola",
-	"Hallo",
-	"Bonjour",
-	"こんにちは",
-	"مرحبا",
-	"γεια σας",
-}
-
-// SayHello implements helloworld.GreeterServer
 func (s *server) ShareGreetings(req *pb.GreetingRequest, stream pb.Greeter_ShareGreetingsServer) error {
-	// randomize the list
-	tmp := make([]string, len(greetings))
-	copy(tmp, greetings)
-	rand.Shuffle(len(tmp), func(i, j int) {
-		tmp[i], tmp[j] = tmp[j], tmp[i]
-	})
-
-	for _, g := range tmp {
-		resp := pb.GreetingReply{
-			Message: g + " " + req.GetName(),
-		}
-
-		if err := stream.Send(&resp); err != nil {
-			return err
-		}
-		// in this example, we are sleeping to simulate doing some server side work
-		time.Sleep(time.Millisecond * 250)
-	}
-
+	// unused in this example, but defined to implement the interface
 	return nil
 }
 
 func (s *server) CrowdGreeting(stream pb.Greeter_CrowdGreetingServer) error {
-	// unused in this example, but needed to implement the interface
+	var names []string
+READ:
+	for {
+		req, err := stream.Recv()
+		switch err {
+		case nil:
+			// keep reading
+		case io.EOF:
+			// done
+			break READ
+		default:
+			log.Printf("failed to read from stream: %v", err)
+			return err
+		}
+		names = append(names, req.GetName())
+	}
+
+	resp := pb.GreetingReply{
+		Message: "hello " + strings.Join(names, ", "),
+	}
+
+	if err := stream.SendAndClose(&resp); err != nil {
+		return err
+	}
+
 	return nil
 }
 
