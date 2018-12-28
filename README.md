@@ -56,6 +56,5 @@ repository clone.
 
 ## TODO
 
-* streaming client
 * bi-directional communication
 
