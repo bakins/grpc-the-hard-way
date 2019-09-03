@@ -5,8 +5,6 @@ set -e
 # requires bash 4
 # quick test of servers/clients
 
-PIDS=()
-
 killServer() {
     PID=$1
     pkill -P $PID
@@ -42,7 +40,6 @@ for SERVER in "${!TESTS[@]}"; do
 
     $SERVER &
     PID=$!
-    PIDS+=$PID
     
     sleep 1
 
